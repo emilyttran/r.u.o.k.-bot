@@ -285,34 +285,12 @@ class OxyCSBot(ChatBot):
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
-        self.professor = None
-        if 'office-hours' in tags:
-            for professor in self.PROFESSORS:
-                if professor in tags:
-                    self.professor = professor
-                    return self.go_to_state('specific_faculty')
-            return self.go_to_state('unknown_faculty')
-        elif 'thanks' in tags:
-            return self.finish('thanks')
+        if "sad" in tags:
+            return self.go_to_state('why_sad')
         else:
             return self.finish('confused')
 
-    # "greeting" state functions
 
-    def on_enter_greeting(self):
-        response = '\n'.join([
-            "Hi!",
-            "How are we feeling today?",
-        ])
-        return response
-
-    def respond_from_greeting(self, message, tags):
-
-        if "sad" in tags:
-            return self.go_to_state('why_sad')
-        # FIXME for why_anxious states
-        # FIXME for confused states
-        # FIXME for IDK states
             
     # "why_sad" state functions
 
@@ -325,10 +303,11 @@ class OxyCSBot(ChatBot):
 
     def respond_from_why_sad(self, message, tags):
         if "failing academics" in tags:
-            return self.go_to_state('talk_to_professors')
+            return self.finish('checkpoint')
+            #return self.go_to_state('talk_to_professors')
 
 
-    #
+
 
 
 
