@@ -183,7 +183,7 @@ class OxyCSBot(ChatBot):
 
         # sad
         "feel": "sad",
-        "hate": "sad",
+        'hate': 'sad',
         'depressed': "sad",
         'disappointed': "sad",
         'miss': "sad",
