@@ -310,6 +310,9 @@ class OxyCSBot(ChatBot):
 
         if "sad" in tags:
             return self.go_to_state('why_sad')
+        # FIXME for why_anxious states
+        # FIXME for confused states
+        # FIXME for IDK states
             
     # "why_sad" state functions
 
@@ -322,7 +325,12 @@ class OxyCSBot(ChatBot):
 
     def respond_from_why_sad(self, message, tags):
         if "failing academics" in tags:
-            return self.finish('checkpoint')
+            return self.go_to_state('talk_to_professors')
+
+
+    #
+
+
 
     # "specific_faculty" state functions
 
@@ -369,7 +377,7 @@ class OxyCSBot(ChatBot):
     # "finish" functions
 
     def finish_confused(self):
-        return "Sorry, I'm just a simple bot that can't understand much. You can ask me about office hours though!"
+        return "CONFUSED"
 
     def finish_location(self):
         return f"{self.professor.capitalize()}'s office is in {self.get_office(self.professor)}"
