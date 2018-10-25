@@ -177,6 +177,8 @@ class OxyCSBot(ChatBot):
         'specific_faculty',
         'unknown_faculty',
         'unrecognized_faculty',
+        'why_sad',
+        'talk_to_professors'
     ]
 
     TAGS = {
@@ -260,7 +262,6 @@ class OxyCSBot(ChatBot):
     # "why_sad" state functions
 
     def on_enter_why_sad(self):
-        return "SAD"
         response = '\n'.join([
             "I'm sorry that you're feeling down the weather right now.",
             "What is on your mind?",
