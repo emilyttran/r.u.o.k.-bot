@@ -180,7 +180,31 @@ class OxyCSBot(ChatBot):
     ]
 
     TAGS = {
-        # intent
+
+        # sad
+        "feel": "sad",
+        "hate": "sad",
+        'depressed': "sad",
+        'disappointed': "sad",
+        'miss': "sad",
+        'hopeless': "sad",
+        'disinterested': "sad",
+
+        # failing academics
+        "test": "failing academics",
+        "exams": "failing academics",
+        "gpa": "failing academics",
+        "classes": "failing academics",
+        "upset": "failing academics",
+        "disappointed": "failing academics",
+        "work": "failing academics",
+        "assignment": "failing academics",
+        "grades": "failing academics",
+        "frustrated": "failing academics",
+        "annoyed": "failing academics",
+        "efforts": "failing academics",
+
+    # intent
         'office hours': 'office-hours',
         'OH': 'office-hours',
         'help': 'office-hours',
@@ -283,12 +307,22 @@ class OxyCSBot(ChatBot):
         return response
 
     def respond_from_greeting(self, message, tags):
-        sad_list = ["feel","hate",'depressed','disappointed','miss','hopeless','disinterested']
 
-        if any(if term in tags for term in sad_list):
+        if "sad" in tags:
             return self.go_to_state('why_sad')
             
+    # "why_sad" state functions
 
+    def on_enter_why_sad(self):
+        response = '\n'.join([
+            "I'm sorry that you're feeling down the weather right now.",
+            "What is on your mind?",
+        ])
+        return response
+
+    def respond_from_why_sad(self, message, tags):
+        if "failing academics" in tags:
+            return self.finish('checkpoint')
 
     # "specific_faculty" state functions
 
@@ -348,6 +382,9 @@ class OxyCSBot(ChatBot):
 
     def finish_thanks(self):
         return "You're welcome!"
+
+    def finish_checkpoint(self):
+        return "CHECKPOINT BABY"
 
 
 if __name__ == '__main__':
