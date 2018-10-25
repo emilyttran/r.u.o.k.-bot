@@ -244,64 +244,19 @@ class OxyCSBot(ChatBot):
         professor has been identified.
         """
         super().__init__(default_state='waiting')
-        self.professor = None
 
-    def get_office_hours(self, professor):
-        """Find the office hours of a professor.
 
-        Arguments:
-            professor (str): The professor of interest.
-
-        Returns:
-            str: The office hours of that professor.
-        """
-        office_hours = {
-            'celia': 'F 12-1:45pm; F 2:45-4:00pm',
-            'hsing-hau': 'T 1-2:30pm; Th 10:30am-noon',
-            'jeff': 'unknown',
-            'justin': 'T 1-2pm; W noon-1pm; F 3-4pm',
-            'kathryn': 'MWF 4-5pm',
-        }
-        return office_hours[professor]
-
-    def get_office(self, professor):
-        """Find the office of a professor.
-
-        Arguments:
-            professor (str): The professor of interest.
-
-        Returns:
-            str: The office of that professor.
-        """
-        office = {
-            'celia': 'Swan 216',
-            'hsing-hau': 'Swan 302',
-            'jeff': 'Fowler 321',
-            'justin': 'Swan B102',
-            'kathryn': 'Swan B101',
-        }
-        return office[professor]
 
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
-        self.professor = None
 
-        if "sad" in tags:
+        if "office-hour" in tags:
             return self.go_to_state('why_sad')
         else:
             return self.finish('checkpoint')
 
-        if 'office-hours' in tags:
-            for professor in self.PROFESSORS:
-                if professor in tags:
-                    self.professor = professor
-                    return self.go_to_state('specific_faculty')
-            return self.go_to_state('unknown_faculty')
-        elif 'thanks' in tags:
-            return self.finish('thanks')
-        else:
-            return self.finish('confused')
+
 
 
             
