@@ -6,7 +6,7 @@ from time import sleep
 
 from slackclient import SlackClient
 
-from oxycsbot import OxyCSBot # FIXME
+from ruokbot import RUOK-Bot # FIXME
 
 
 def get_token():
@@ -85,4 +85,4 @@ def run(bot_class):
 
 
 if __name__ == '__main__':
-    run(OxyCSBot) # FIXME
+    run(RUOK-Bot) # FIXME
