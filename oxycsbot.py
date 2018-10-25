@@ -250,8 +250,8 @@ class OxyCSBot(ChatBot):
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
-
-        if "office-hour" in tags:
+        return tags
+        if "sad" in tags:
             return self.go_to_state('why_sad')
         else:
             return self.finish('checkpoint')
