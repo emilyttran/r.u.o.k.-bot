@@ -273,6 +273,23 @@ class OxyCSBot(ChatBot):
         else:
             return self.finish('confused')
 
+    # "greeting" state functions
+
+    def on_enter_greeting(self):
+        response = '\n'.join([
+            "Hi!",
+            "How are we feeling today?",
+        ])
+        return response
+
+    def respond_from_greeting(self, message, tags):
+        sad_list = ["feel","hate",'depressed','disappointed','miss','hopeless','disinterested']
+
+        if any(if term in tags for term in sad_list):
+            return self.go_to_state('why_sad')
+            
+
+
     # "specific_faculty" state functions
 
     def on_enter_specific_faculty(self):
