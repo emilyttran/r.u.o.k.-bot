@@ -252,17 +252,15 @@ class OxyCSBot(ChatBot):
     def respond_from_waiting(self, message, tags):
 
         if "sad" in tags:
-            return "SAD" # self.go_to_state('why_sad')
+            return self.go_to_state('why_sad')
         else:
             return self.finish('checkpoint')
-
-
-
 
             
     # "why_sad" state functions
 
     def on_enter_why_sad(self):
+        return "SAD"
         response = '\n'.join([
             "I'm sorry that you're feeling down the weather right now.",
             "What is on your mind?",
