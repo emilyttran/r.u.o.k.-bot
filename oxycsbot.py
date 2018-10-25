@@ -290,6 +290,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('talk_to_professors')
         elif "social isolation" in tags:
             return self.go_to_state('clubs')
+        else:
+            return self.finish('confused')
         #FIXME
 
     # clubs state functions
@@ -321,7 +323,7 @@ class OxyCSBot(ChatBot):
     def respond_from_why_not(self, message, tags):
         #FIXME paste in content of respond_from_why_sad and respond_from_why_anxious when it's finished
         return "FIXME"
-    
+
     # talk_to_professors state functions
 
     def on_enter_talk_to_professors(self):
