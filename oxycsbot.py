@@ -178,7 +178,8 @@ class OxyCSBot(ChatBot):
         'unknown_faculty',
         'unrecognized_faculty',
         'why_sad',
-        'talk_to_professors'
+        'talk_to_professors',
+        'other_factors'
     ]
 
     TAGS = {
@@ -191,13 +192,14 @@ class OxyCSBot(ChatBot):
         'miss': "sad",
         'hopeless': "sad",
         'disinterested': "sad",
+        'empty': 'sad',
 
         # failing academics
         "test": "failing academics",
+        "midterm": "failing academics",
         "exams": "failing academics",
         "gpa": "failing academics",
         "classes": "failing academics",
-        "upset": "failing academics",
         "disappointed": "failing academics",
         "work": "failing academics",
         "assignment": "failing academics",
@@ -205,6 +207,21 @@ class OxyCSBot(ChatBot):
         "frustrated": "failing academics",
         "annoyed": "failing academics",
         "efforts": "failing academics",
+        "quit school": "failing academics",
+
+        # social isolation
+        "depressed": "social isolation",
+        "disconnected": "social isolation",
+        "lonely": "social isolation",
+        "no friends": "social isolation",
+        "homesick": "social isolation",
+        "empty": "social isolation",
+        "don't have": "social isolation",
+        "alone": "social isolation",
+        "friendless": "social isolation",
+        "abandoned": "social isolation",
+        "care about me": "social isolation",
+        "not cared for": "social isolation",
 
     # intent
         'office hours': 'office-hours',
@@ -271,10 +288,74 @@ class OxyCSBot(ChatBot):
     def respond_from_why_sad(self, message, tags):
         if "failing academics" in tags:
             return self.go_to_state('talk_to_professors')
+        elif "social isolation" in tags:
+            return self.go_to_state('clubs')
+        #FIXME
 
+    # clubs state functions
 
-    #
+    def on_enter_clubs(self):
+        response = '\n'.join([
+            "I'm sorry to hear that.",
+            "School can be a very daunting experience for many people. You are not alone in this.",
+            "One of the best and easiest ways to make friends or to feel more connected is to join a club.",
+            "Do you have any interests? Would you be interested in joining a club?"
+        ])
 
+        return response
+
+    def respond_from_clubs(self, message, tags):
+        if 'no' in tags:
+            return self.go_to_state('why_not')
+        elif 'yes' in tags:
+            return self.finish('join_clubs')
+        elif 'idk' in tags:
+            return self.finish('should_join_club')
+        #FIXME need else
+
+    # why_not state fucntions
+
+    def on_enter_why_not(self):
+        return "Hmm, I see. Why not, if I might ask?"
+
+    def respond_from_why_not(self, message, tags):
+        #FIXME paste in content of respond_from_why_sad and respond_from_why_anxious when it's finished
+        return "FIXME"
+    
+    # talk_to_professors state functions
+
+    def on_enter_talk_to_professors(self):
+        response = '\n'.join([
+            "Handling school is very tough. I can't imagine what you're going through.",
+            "Have you tried reaching out to any professor or tutoring services available at your school?"
+        ])
+
+        return response
+
+    def respond_from_talk_to_professors(self, messsage, tags):
+        if 'no' in tags:
+            return self.finish('talk_to_them')
+        elif 'yes' in tags:
+            return self.go_to_state('other_factors')
+        else:
+            return self.finish('fail')
+
+    # "other_factors" state functions
+
+    def on_enter_other_factors(self):
+        response = '\n'.join([
+            "I'm so proud of you for reaching out for resources!",
+            "That's a hard thing to do. I'm sorry that it hasn't helped",
+            "Maybe there are other factors that might affecting your academic life.",
+            "Can you think of other reasons why you might be struggling?"
+        ])
+
+        return response
+
+    def respond_from_other_factors(self, message, tags):
+        if 'health issues' in tags:
+            return self.finish('health_resources')
+        #FIXME
 
 
     # "specific_faculty" state functions
@@ -338,6 +419,31 @@ class OxyCSBot(ChatBot):
 
     def finish_checkpoint(self):
         return "CHECKPOINT BABY"
+
+    def finish_talk_to_them(self):
+        return '\n'.join([
+            "You'd be surprise how helpful it is to go to office hours or to tutoring services!",
+            "You can also try asking classmates for help too. You might not be the only one struggling",
+            "I hope this was helpful!"
+        ])
+
+    def finish_health_resources(self):
+        return '\n'.join({
+            "That's really rough to go through alone.",
+            "Maybe you can try going to your school's medical center or center for some help.",
+            "You can also talk to your professors directly about this. They might be able to empathize!"
+        })
+
+    def finish_join_clubs(self):
+        return '\n'.join([
+            "Cool! Next would be to check out your school's list of clubs and reach out to them about how to join.",
+            "I know that seems like a lot, but I believe in you!"
+        ])
+
+    def finish_should_join_club(self):
+        return '\n'.join([
+            "Check out your school's list of clubs. It wouldn't hurt to see what's out there!"
+        ])
 
 
 if __name__ == '__main__':
