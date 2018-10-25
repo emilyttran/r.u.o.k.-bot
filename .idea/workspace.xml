@@ -26,8 +26,8 @@
       <file leaf-file-name="oxycsbot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/oxycsbot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="43">
-              <caret line="271" column="0" lean-forward="true" selection-start-line="271" selection-start-column="0" selection-end-line="271" selection-end-column="0" />
+            <state relative-caret-position="-1361">
+              <caret line="260" column="8" lean-forward="false" selection-start-line="260" selection-start-column="8" selection-end-line="260" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -161,8 +161,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/oxycsbot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="43">
-          <caret line="271" column="0" lean-forward="true" selection-start-line="271" selection-start-column="0" selection-end-line="271" selection-end-column="0" />
+        <state relative-caret-position="-1361">
+          <caret line="260" column="8" lean-forward="false" selection-start-line="260" selection-start-column="8" selection-end-line="260" selection-end-column="8" />
           <folding />
         </state>
       </provider>

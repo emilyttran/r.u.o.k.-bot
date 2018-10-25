@@ -222,6 +222,7 @@ class OxyCSBot(ChatBot):
         "abandoned": "social isolation",
         "care about me": "social isolation",
         "not cared for": "social isolation",
+        "failing": "social isolation",
 
     # intent
         'office hours': 'office-hours',
@@ -240,12 +241,25 @@ class OxyCSBot(ChatBot):
 
         # generic
         'thanks': 'thanks',
+        'thank you': 'thanks',
+        'ty': 'thanks',
+        'ok': 'success',
+        'okie':'success',
         'okay': 'success',
+        'sure': 'success',
         'bye': 'success',
         'yes': 'yes',
+        'ya': 'yes',
         'yep': 'yes',
         'no': 'no',
         'nope': 'no',
+        'not really': 'no',
+        'nah': 'no',
+        'idk': 'idk',
+        'not sure': 'idk',
+        "don't know": 'idk',
+        
+
     }
 
     PROFESSORS = [
@@ -274,7 +288,7 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('why_sad')
         else:
             return self.finish('checkpoint')
-
+        #FIXME add in anxious, idk, suicidal
             
     # "why_sad" state functions
 
@@ -292,7 +306,7 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('clubs')
         else:
             return self.finish('confused')
-        #FIXME
+        #FIXME add in specific_event, suicidal
 
     # clubs state functions
 
