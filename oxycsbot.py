@@ -369,6 +369,12 @@ class OxyCSBot(ChatBot):
             return self.go_to_state("why_sad")
         elif "help" or "hi" in tags:
             return self.go_to_state('greeting')
+        if 'health issues' in tags:
+            return self.finish('health_resources')
+        elif "difficult courses" in tags:
+            return self.finish('academic_resources')
+        elif "courses overload" in tags:
+            return self.finish('course_overload_response')
         else:
             return tags
         # FIXME add in anxious, idk,
