@@ -300,9 +300,7 @@ class OxyCSBot(ChatBot):
         """
         super().__init__(default_state='waiting')
 
-    def respond_using(self, state, message):
-        respond_method = getattr(self, f'respond_from_{state}')
-        return respond_method(message, self._get_tags(message))
+   
 
     # "waiting" state functions
 
@@ -318,11 +316,7 @@ class OxyCSBot(ChatBot):
 
         # greeting state functions
 
-    def on_enter_greeting(self):
-        return "I am here to help! How are you feeling today?"
 
-    def respond_from_greeting(self, message, tags):
-        return self.respond_using("waiting", message)
 
     # "why_sad" state functions
 
