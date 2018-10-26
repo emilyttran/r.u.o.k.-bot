@@ -244,6 +244,7 @@ class OxyCSBot(ChatBot):
         "care about me": "social isolation",
         "not cared for": "social isolation",
         "failing": "social isolation",
+        ['school', 'hard']: "social isolation",  # not sure if this can work
 
 
 
