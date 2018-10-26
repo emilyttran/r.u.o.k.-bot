@@ -6,7 +6,6 @@ from collections import Counter
 
 import time
 
-
 class ChatBot:
     """A tag-based chatbot framework
 
@@ -62,6 +61,7 @@ class ChatBot:
             ]))
         self.default_state = default_state
         self.state = self.default_state
+        self.flag = False
         self.tags = {}
         self._check_states()
         self._check_tags()
@@ -137,6 +137,7 @@ class ChatBot:
             str: The response of the chatbot.
         """
         respond_method = getattr(self, f'respond_from_{self.state}')
+        print(self._get_tags(message))
         return respond_method(message, self._get_tags(message))
 
     def finish(self, manner):
@@ -152,7 +153,11 @@ class ChatBot:
         """
         response = getattr(self, f'finish_{manner}')()
         self.state = self.default_state
-        return response
+        return '\n'.join([
+            response,
+            " ",
+            "< Conversation has ended >"
+        ])
 
     def _get_tags(self, message):
         """Find all tagged words/phrases in a message.
@@ -186,7 +191,8 @@ class OxyCSBot(ChatBot):
         'greeting',
         'clubs',
         'suicidal_response_friends',
-        'anxious_breathe'
+        'anxious_breathe',
+        'figure_out_feelings'
     ]
 
     TAGS = {
@@ -259,7 +265,6 @@ class OxyCSBot(ChatBot):
         "death": "suicidal",
         "end": "suicidal",
         "commit": "suicidal",
-        "feel": "suicidal",
         "useless": "suicidal",
         "worthless": "suicidal",
         "no purpose": "suicidal",
@@ -289,11 +294,13 @@ class OxyCSBot(ChatBot):
         # overload
         "too much": "courses overload",
         "overwhelming": "courses overload",
+        "overwhelm": "courses overload",
         "demanding": "courses overload",
         "so much": "courses overload",
         "overwhelmed": "courses overload",
         "burdened": "courses overload",
         "exhausted": "courses overload",
+        "exhausting": "courses overload",
         "excessive": "courses overload",
         "overloading": "courses overload",
         "crazy": "courses overload",
@@ -329,7 +336,12 @@ class OxyCSBot(ChatBot):
         'no thanks': 'no',
         'idk': 'idk',
         'not sure': 'idk',
-        "don't know": 'idk'
+        "don't know": 'idk',
+        "good": "good",
+        "great": "good",
+        "well": "good",
+        "happy": "good",
+        "fine": "good"
 
     }
 
@@ -356,9 +368,10 @@ class OxyCSBot(ChatBot):
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
-
         if "sad" in tags:
             return self.go_to_state('why_sad')
+        elif "good" in tags:
+            return self.finish("good_response")
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
@@ -367,16 +380,19 @@ class OxyCSBot(ChatBot):
             return self.finish("thanks")
         elif "idk" in tags:
             return self.go_to_state("why_sad")
-        elif "help" or "hi" in tags:
-            return self.go_to_state('greeting')
-        if 'health issues' in tags:
+        elif 'health issues' in tags:
             return self.finish('health_resources')
         elif "difficult courses" in tags:
             return self.finish('academic_resources')
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
+        elif "help" in tags or "hi" in tags:
+            return self.go_to_state('greeting')
+        elif "success" in tags and self.flag==True:
+            self.flag = False
+            return self.finish("success")
         else:
-            return tags
+            return self.finish("confused")
         # FIXME add in anxious, idk,
 
     # greeting state functions
@@ -434,9 +450,47 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('talk_to_professors')
         elif "social isolation" in tags:
             return self.go_to_state('clubs')
+        elif 'health issues' in tags:
+            return self.finish('health_resources')
+        elif "difficult courses" in tags:
+            return self.finish('academic_resources')
+        elif "courses overload" in tags:
+            return self.finish('course_overload_response')
+        elif "idk" in tags:
+            return self.go_to_state("figure_out_feelings")
         else:
             return self.finish('confused')
-        # FIXME add in specific_event, suicidal
+        # FIXME add in specific_event
+
+    # figure_out_feeling state functions
+
+    def on_enter_figure_out_feelings(self):
+        return '\n'.join([
+            "Let's figure this out together.",
+            "Do you feel sad or maybe even overwhelmed?"
+        ])
+
+    def respond_from_figure_out_feelings(self, message, tags):
+        if "sad" in tags or "yes" in tags:
+            return self.go_to_state('why_sad')
+        elif "no" in tags:
+            return self.finish('fail')
+        elif "suicidal" in tags:
+            return self.go_to_state('suicidal_response_friends')
+        elif "anxious" in tags:
+            return self.go_to_state('anxious_breathe')
+        elif "idk" in tags:
+            return self.go_to_state("why_sad")
+        elif 'health issues' in tags:
+            return self.finish('health_resources')
+        elif "difficult courses" in tags:
+            return self.finish('academic_resources')
+        elif "courses overload" in tags:
+            return self.finish('course_overload_response')
+        elif "help" or "hi" in tags:
+            return self.go_to_state('greeting')
+        else:
+            return self.finish("confused")
 
     # clubs state functions
 
@@ -552,13 +606,13 @@ class OxyCSBot(ChatBot):
     # "finish" functions
 
     def finish_confused(self):
-        return "CONFUSED"
+        return "Sorry. I am not sure what you mean. Can you rephrase?"
 
     def finish_location(self):
         return f"{self.professor.capitalize()}'s office is in {self.get_office(self.professor)}"
 
     def finish_success(self):
-        return 'Great, let me know if you need anything else!'
+        return 'Alright. Hang in there, let know if you need anything else'
 
     def finish_fail(self):
         return "I've tried my best but I still don't understand. Maybe try asking other students?"
@@ -588,7 +642,7 @@ class OxyCSBot(ChatBot):
             "DROP A CLASS"  #FIXME
         ])
 
-    def finish_academic_resouces(self):
+    def finish_academic_resources(self):
         return '\n'.join([
             "ACADEMIC RESOURCES"  #FIXME
         ])
@@ -612,13 +666,24 @@ class OxyCSBot(ChatBot):
         ])
 
     def finish_hotline(self):
+        self.flag = True
+
         return '\n'.join([
             "Please call the suicide hotline."
         ])
 
     def finish_talk_to_friends(self):
+        self.flag = True
         return '\n'.join([
             "I'm sure that they really care about you. Please talk to them about how you are feeling!"
+        ])
+
+    def finish_good_response(self):
+        self.flag = True
+        return '\n '.join([
+            "That's great to hear!",
+            "Remember that it is healthy to talk about your emotions, so please let me know if you're feeling any negativity. ",
+            "School can be rough to experience."
         ])
 
 
