@@ -324,14 +324,16 @@ class OxyCSBot(ChatBot):
 
         if "sad" in tags:
             return self.go_to_state('why_sad')
-        elif "help" or "hi" in tags:
-            return tags #self.go_to_state('greeting')
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
             return self.go_to_state('anxious_breathe')
         elif "thanks" in tags:
             return self.finish("thanks")
+        elif "idk" in tags:
+            return self.go_to_state("why_sad")
+        elif "help" or "hi" in tags:
+            return self.go_to_state('greeting')
         else:
             return tags
         # FIXME add in anxious, idk,
