@@ -192,6 +192,10 @@ class OxyCSBot(ChatBot):
     TAGS = {
 
         'help': 'help',
+        'hi': 'hi',
+        'hello':'hi',
+        'howdy': 'hi',
+        "what's up": 'hi',
 
         # sad
         "sad": "sad",
@@ -210,6 +214,7 @@ class OxyCSBot(ChatBot):
         # anxious
         "future": "anxious",
         "career": "anxious",
+        "anxious": "anxious",
         "worried": "anxious",
         "nervous": "anxious",
         "restless": "anxious",
@@ -305,12 +310,12 @@ class OxyCSBot(ChatBot):
 
         if "sad" in tags:
             return self.go_to_state('why_sad')
-        elif "help" in tags:
+        elif "help" or "hi" in tags:
             return self.go_to_state('greeting')
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
-            return self.go_to_state('anxious_breath')
+            return self.go_to_state('anxious_breathe')
         else:
             return tags
         # FIXME add in anxious, idk,
