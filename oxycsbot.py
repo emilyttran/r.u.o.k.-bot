@@ -265,6 +265,41 @@ class OxyCSBot(ChatBot):
         "no purpose": "suicidal",
         "alive": "suicidal",
 
+        # health issues
+        "sick": "health issues",
+        "don't feel well": "health issues",
+        "dizzy": "health issues",
+        "tired": "health issues",
+        "migraine": "health issues",
+        "nausea": "health issues",
+        "nauseous": "health issues",
+        "aches": "health issues",
+        "stomachache": "health issues",
+
+        # difficult courses
+        "hard time": "difficult courses",
+        "don't understand": "difficult courses",
+        "material": "difficult courses",
+        "hard": "difficult courses",
+        "difficult": "difficult courses",
+        "I'm behind": "difficult courses",
+        "trouble": "difficult courses",
+        "helpless": "difficult courses",
+
+        # overload
+        "too much": "courses overload",
+        "overwhelming": "courses overload",
+        "demanding": "courses overload",
+        "so much": "courses overload",
+        "overwhelmed": "courses overload",
+        "burdened": "courses overload",
+        "exhausted": "courses overload",
+        "excessive": "courses overload",
+        "overloading": "courses overload",
+        "crazy": "courses overload",
+        "intense": "courses overload",
+        "so done": "courses overload",
+
         # professors
         'kathryn': 'kathryn',
         'leonard': 'kathryn',
@@ -460,7 +495,11 @@ class OxyCSBot(ChatBot):
     def respond_from_other_factors(self, message, tags):
         if 'health issues' in tags:
             return self.finish('health_resources')
-        # FIXME
+        elif "difficult courses" in tags:
+            return self.finish('academic_resources')
+        elif "courses overload" in tags:
+            return self.finish('course_overload_response')
+        # FIXME add why_sad responses
 
     # "specific_faculty" state functions
 
@@ -538,6 +577,16 @@ class OxyCSBot(ChatBot):
             "You can also talk to your professors directly about this. They might be able to empathize!"
         })
 
+    def finish_course_overload_response(self):
+        return '\n'.join([
+            "DROP A CLASS"  #FIXME
+        ])
+
+    def finish_academic_resouces(self):
+        return '\n'.join([
+            "ACADEMIC RESOURCES"  #FIXME
+        ])
+
     def finish_join_clubs(self):
         return '\n'.join([
             "Cool! Next would be to check out your school's list of clubs and reach out to them about how to join.",
@@ -565,6 +614,8 @@ class OxyCSBot(ChatBot):
         return '\n'.join([
             "I'm sure that they really care about you. Please talk to them about how you are feeling!"
         ])
+
+
 
 
 if __name__ == '__main__':
