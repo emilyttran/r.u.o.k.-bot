@@ -329,13 +329,13 @@ class OxyCSBot(ChatBot):
 
     # anxious_breath state functions
 
-    def breatheCountdown(x):
-            return x
-
     def on_enter_anxious_breathe(self):
-        for x in range(10, 0, -1):
-            self.breatheCountdown(x)
-        return "Do you feel better?"
+        return '\n'.join([
+            "You must be feeling overwhelmed right now.",
+            "Let's pull ourselves into the present.",
+            "Please close your eyes and take 3 huge breaths."
+            "Do you feel better?"
+        ])
 
     def respond_from_anxious_breathe(self, message, tags):
         if "yes" in tags:
