@@ -180,12 +180,19 @@ class OxyCSBot(ChatBot):
         'why_sad',
         'talk_to_professors',
         'other_factors'
+        'need_help',
+        'greeting',
+        'clubs',
+        'suicidal_response_friends',
+        'anxious_breathe'
     ]
 
     TAGS = {
 
+        'help': 'help',
+
         # sad
-        "feel": "sad",
+        "sad": "sad",
         'hate': 'sad',
         'depressed': "sad",
         'disappointed': "sad",
@@ -193,6 +200,21 @@ class OxyCSBot(ChatBot):
         'hopeless': "sad",
         'disinterested': "sad",
         'empty': 'sad',
+        'life is meaningless': 'sad',
+        'no point in': 'sad',
+        'not good': 'sad',
+        'emotional': 'sad',
+
+        # anxious
+        "future": "anxious",
+        "career": "anxious",
+        "worried": "anxious",
+        "nervous": "anxious",
+        "restless": "anxious",
+        "agitated": "anxious",
+        "life": "anxious",
+        "uneasy": "anxious",
+        "troubled": "anxious",
 
         # failing academics
         "test": "failing academics",
@@ -210,7 +232,6 @@ class OxyCSBot(ChatBot):
         "quit school": "failing academics",
 
         # social isolation
-        "depressed": "social isolation",
         "disconnected": "social isolation",
         "lonely": "social isolation",
         "no friends": "social isolation",
@@ -223,8 +244,9 @@ class OxyCSBot(ChatBot):
         "care about me": "social isolation",
         "not cared for": "social isolation",
         "failing": "social isolation",
+        ['school', 'hard']: "social isolation",  # not sure if this can work
 
-    # intent
+        # intent
         'office hours': 'office-hours',
         'OH': 'office-hours',
         'help': 'office-hours',
@@ -278,7 +300,9 @@ class OxyCSBot(ChatBot):
         """
         super().__init__(default_state='waiting')
 
-
+    def respond_using(self, state, message):
+        respond_method = getattr(self, f'respond_from_{state}')
+        return respond_method(message, self._get_tags(message))
 
     # "waiting" state functions
 
@@ -286,10 +310,20 @@ class OxyCSBot(ChatBot):
 
         if "sad" in tags:
             return self.go_to_state('why_sad')
+        elif "help" in tags:
+            return self.go_to_state('greeting')
         else:
             return self.finish('checkpoint')
         #FIXME add in anxious, idk, suicidal
-            
+
+        # greeting state functions
+
+    def on_enter_greeting(self):
+        return "I am here to help! How are you feeling today?"
+
+    def respond_from_greeting(self, message, tags):
+        return self.respond_using("waiting", message)
+
     # "why_sad" state functions
 
     def on_enter_why_sad(self):
