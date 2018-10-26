@@ -4,6 +4,8 @@
 import re
 from collections import Counter
 
+import time
+
 
 class ChatBot:
     """A tag-based chatbot framework
@@ -244,9 +246,6 @@ class OxyCSBot(ChatBot):
         "care about me": "social isolation",
         "not cared for": "social isolation",
         "failing": "social isolation",
-        ['school', 'hard']: "social isolation",  # not sure if this can work
-
-
 
         # professors
         'kathryn': 'kathryn',
@@ -263,7 +262,7 @@ class OxyCSBot(ChatBot):
         'thank you': 'thanks',
         'ty': 'thanks',
         'ok': 'success',
-        'okie':'success',
+        'okie': 'success',
         'okay': 'success',
         'sure': 'success',
         'bye': 'success',
@@ -276,8 +275,7 @@ class OxyCSBot(ChatBot):
         'nah': 'no',
         'idk': 'idk',
         'not sure': 'idk',
-        "don't know": 'idk',
-        
+        "don't know": 'idk'
 
     }
 
@@ -297,28 +295,74 @@ class OxyCSBot(ChatBot):
         """
         super().__init__(default_state='waiting')
 
-
+    def respond_using(self, state, message):
+        respond_method = getattr(self, f'respond_from_{state}')
+        return respond_method(message, self._get_tags(message))
 
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
+
         if "sad" in tags:
             return self.go_to_state('why_sad')
         elif "help" in tags:
             return self.go_to_state('greeting')
+        elif "suicidal" in tags:
+            return self.go_to_state('suicidal_response_friends')
+        elif "anxious" in tags:
+            return self.go_to_state('anxious_breath')
         else:
-            return self.finish('checkpoint')
-        #FIXME add in anxious, idk, suicidal
+            return tags
+        # FIXME add in anxious, idk,
 
-        # greeting state functions
+    # greeting state functions
 
+    def on_enter_greeting(self):
+        return "I am here to help! How are you feeling today?"
 
+    def respond_from_greeting(self, message, tags):
+        return self.respond_using("waiting", message)
+
+    # anxious_breath state functions
+
+    def breatheCountdown(startingCount):
+        for x in range(startingCount, 0, -1):
+            time.sleep(1)
+            print(x)
+
+    def on_enter_anxious_breathe(self):
+        print("Let's take some time to bring ourselves back to the present. Inhale with me")
+        self.breatheCountdown(10)
+        return "Do you feel better?"
+
+    def respond_from_anxious_breathe(self, message, tags):
+        if "yes" in tags:
+            return self.finish("success")
+        elif "no" or "idk" in tags:
+            return self.respond_using("why_sad", message)
+
+    # suicidal_response_friends state functions
+
+    def on_enter_suicidal_response_friends(self):
+        return '\n'.join([
+            "I'm sorry... you must be going through a lot."
+            "It's tough going through them alone."
+            "Do you have any friends, family, or anyone you can talk to right now?"
+        ])
+
+    def respond_from_suicidal_response_friends(self, message, tags):
+        if "idk" in tags:
+            return self.finish('hotline_idk')
+        elif "no" in tags:
+            return self.finish('hotline')
+        elif "yes" in tags:
+            return self.finish('talk_to_friends')
 
     # "why_sad" state functions
 
     def on_enter_why_sad(self):
         response = '\n'.join([
-            "I'm sorry that you're feeling down the weather right now.",
+            "Hmm, I'm sorry to hear that.",
             "What is on your mind?",
         ])
         return response
@@ -330,7 +374,7 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('clubs')
         else:
             return self.finish('confused')
-        #FIXME add in specific_event, suicidal
+        # FIXME add in specific_event, suicidal
 
     # clubs state functions
 
@@ -351,7 +395,7 @@ class OxyCSBot(ChatBot):
             return self.finish('join_clubs')
         elif 'idk' in tags:
             return self.finish('should_join_club')
-        #FIXME need else
+        # FIXME need else
 
     # why_not state fucntions
 
@@ -359,7 +403,7 @@ class OxyCSBot(ChatBot):
         return "Hmm, I see. Why not, if I might ask?"
 
     def respond_from_why_not(self, message, tags):
-        #FIXME paste in content of respond_from_why_sad and respond_from_why_anxious when it's finished
+        # FIXME paste in content of respond_from_why_sad and respond_from_why_anxious when it's finished
         return "FIXME"
 
     # talk_to_professors state functions
@@ -395,8 +439,7 @@ class OxyCSBot(ChatBot):
     def respond_from_other_factors(self, message, tags):
         if 'health issues' in tags:
             return self.finish('health_resources')
-        #FIXME
-
+        # FIXME
 
     # "specific_faculty" state functions
 
@@ -483,6 +526,23 @@ class OxyCSBot(ChatBot):
     def finish_should_join_club(self):
         return '\n'.join([
             "Check out your school's list of clubs. It wouldn't hurt to see what's out there!"
+        ])
+
+    def finish_hotline_idk(self):
+        return '\n'.join([
+            "That's okay. No matter the case, know that you deserve to live. ",
+            "And if you feel like causing harm to yourself, please call a friend or the hotline.",
+            "We can also talk about what you're feeling"
+        ])
+
+    def finish_hotline(self):
+        return '\n'.join([
+            "Please call the suicide hotline."
+        ])
+
+    def finish_talk_to_friends(self):
+        return '\n'.join([
+            "I'm sure that they really care about you. Please talk to them about how you are feeling!"
         ])
 
 
