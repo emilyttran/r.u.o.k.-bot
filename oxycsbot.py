@@ -332,11 +332,14 @@ class OxyCSBot(ChatBot):
     def breatheCountdown(startingCount):
         for x in range(startingCount, 0, -1):
             time.sleep(1)
-            print(x)
+            return x
 
     def on_enter_anxious_breathe(self):
         print("Let's take some time to bring ourselves back to the present. Inhale with me")
         # self.breatheCountdown(10)
+        for x in range(10, 0, -1):
+            time.sleep(1)
+            return x
         return "Do you feel better?"
 
     def respond_from_anxious_breathe(self, message, tags):
