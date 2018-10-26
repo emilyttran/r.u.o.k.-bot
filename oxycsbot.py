@@ -251,6 +251,20 @@ class OxyCSBot(ChatBot):
         "not cared for": "social isolation",
         "failing": "social isolation",
 
+        # suicidal
+        "die": "suicidal",
+        "kill myself": "suicidal",
+        "killed": "suicidal",
+        "life": "suicidal",
+        "death": "suicidal",
+        "end": "suicidal",
+        "commit": "suicidal",
+        "feel": "suicidal",
+        "useless": "suicidal",
+        "worthless": "suicidal",
+        "no purpose": "suicidal",
+        "alive": "suicidal",
+
         # professors
         'kathryn': 'kathryn',
         'leonard': 'kathryn',
@@ -277,6 +291,7 @@ class OxyCSBot(ChatBot):
         'nope': 'no',
         'not really': 'no',
         'nah': 'no',
+        'no thanks': 'no',
         'idk': 'idk',
         'not sure': 'idk',
         "don't know": 'idk'
@@ -309,12 +324,14 @@ class OxyCSBot(ChatBot):
 
         if "sad" in tags:
             return self.go_to_state('why_sad')
-        elif "help" or "hi" in tags:
-            return self.go_to_state('greeting')
+        #elif "help" or "hi" in tags:
+            #return self.go_to_state('greeting')
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
             return self.go_to_state('anxious_breathe')
+        elif "thanks" in tags:
+            return self.finish("thanks")
         else:
             return tags
         # FIXME add in anxious, idk,
