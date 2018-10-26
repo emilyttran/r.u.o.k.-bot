@@ -244,12 +244,8 @@ class OxyCSBot(ChatBot):
         "care about me": "social isolation",
         "not cared for": "social isolation",
         "failing": "social isolation",
-        ['school', 'hard']: "social isolation",  # not sure if this can work
 
-        # intent
-        'office hours': 'office-hours',
-        'OH': 'office-hours',
-        'help': 'office-hours',
+
 
         # professors
         'kathryn': 'kathryn',
@@ -300,12 +296,11 @@ class OxyCSBot(ChatBot):
         """
         super().__init__(default_state='waiting')
 
-   
+
 
     # "waiting" state functions
 
     def respond_from_waiting(self, message, tags):
-
         if "sad" in tags:
             return self.go_to_state('why_sad')
         elif "help" in tags:
