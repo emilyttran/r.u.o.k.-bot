@@ -62,7 +62,8 @@ class ChatBot:
         self.default_state = default_state
         self.state = self.default_state
         self.prev_state = ""
-        self.flag = False
+        self.finish_flag = False  # Keeps track if the conversation has reached an end
+        self.greeted_flag = False   # Keeps track if user has already been greeted
         self.tags = {}
         self._check_states()
         self._check_tags()
@@ -157,13 +158,23 @@ class ChatBot:
         Returns:
             str: The response of the chatbot.
         """
+        self.finish_flag = True
         response = getattr(self, f'finish_{manner}')()
-        self.state = self.default_state
-        return '\n'.join([
-            response,
-            " ",
-            "< Conversation has ended >"
-        ])
+        print(self.state)
+        if manner is "success" or manner is "fail" or manner is "thanks": # if it truly is the end of the conversation, add the tag
+            self.state = self.default_state
+            self.finish_flag = False
+            return '\n'.join([
+                response,
+                " ",
+                "< Conversation has ended >"
+            ])
+        else:
+            self.state = self.default_state # don't need to reset finish flag so that user can respond to bot
+            return response
+
+
+
 
     def _get_tags(self, message):
         """Find all tagged words/phrases in a message.
@@ -192,15 +203,14 @@ class OxyCSBot(ChatBot):
         'unrecognized_faculty',
         'why_sad',
         'talk_to_professors',
-        'other_factors'
-        'need_help',
+        'other_factors',
         'greeting',
         'clubs',
         'suicidal_response_friends',
         'anxious_breathe',
         'figure_out_feelings',
         'specific_event_response',
-        'confused'
+        'confused',
     ]
 
     TAGS = {
@@ -399,8 +409,10 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
             return self.go_to_state('anxious_breathe')
-        elif "thanks" in tags:
+        elif "thanks" in tags and self.finish_flag:
             return self.finish("thanks")
+        elif "thanks" in tags and not self.finish_flag:
+            return self.go_to_state("confused")
         elif "idk" in tags:
             return self.go_to_state("why_sad")
         elif 'health issues' in tags:
@@ -413,19 +425,22 @@ class OxyCSBot(ChatBot):
             return self.go_to_state("specific_event_response")
         elif "help" in tags or "hi" in tags:
             return self.go_to_state('greeting')
-        elif "success" in tags and self.flag==True:
-            self.flag = False
+        elif "success" in tags and self.finish_flag: # show success if user says ok at the end of conversation
             return self.finish("success")
+        elif "success" in tags and self.greeted_flag:
+            self.greeted_flag = False
+            return self.finish("good_response")
         else:
             return self.go_to_state("confused")
-        # FIXME add in anxious, idk,
 
     # greeting state functions
 
     def on_enter_greeting(self):
+        self.greeted_flag = True
         return "I am here to help! How are you feeling today?"
 
     def respond_from_greeting(self, message, tags):
+        self.greeted_flag = True
         return self.respond_using("waiting", message)
 
     # anxious_breath state functions
@@ -602,8 +617,8 @@ class OxyCSBot(ChatBot):
 
     def on_enter_confused(self):
             return '\n '.join([
-                "Sorry, I am just a bot.",
-                "Can you check for typos or rephrase what you were saying?"
+                "Sorry, I am just a bot. And I'm confused about what you just typed.",
+                "Maybe try checking for typos or rephrasing what you were saying?"
             ])
 
     def respond_from_confused(self, message, tags):
@@ -656,11 +671,6 @@ class OxyCSBot(ChatBot):
 
     # "finish" functions
 
-    def finish_confused(self):
-        return "Sorry. I am not sure what you mean. Can you rephrase?"
-
-    def finish_location(self):
-        return f"{self.professor.capitalize()}'s office is in {self.get_office(self.professor)}"
 
     def finish_success(self):
         return 'Alright. Hang in there, let know if you need anything else'
@@ -683,9 +693,9 @@ class OxyCSBot(ChatBot):
 
     def finish_health_resources(self):
         return '\n'.join({
-            "That's really rough to go through alone.",
+            "That must be really rough to go through right now.",
             "Maybe you can try going to your school's medical center or center for some help.",
-            "You can also talk to your professors directly about this. They might be able to empathize!"
+            "If this is affecting your school work, maybe you can also talk to your professors directly about this. They might be able to empathize!"
         })
 
     def finish_course_overload_response(self):
@@ -710,6 +720,7 @@ class OxyCSBot(ChatBot):
         ])
 
     def finish_hotline_idk(self):
+
         return '\n'.join([
             "That's okay. No matter the case, know that you deserve to live. ",
             "And if you feel like causing harm to yourself, please call a friend or the hotline.",
@@ -717,20 +728,17 @@ class OxyCSBot(ChatBot):
         ])
 
     def finish_hotline(self):
-        self.flag = True
 
         return '\n'.join([
             "Please call the suicide hotline."
         ])
 
     def finish_talk_to_friends(self):
-        self.flag = True
         return '\n'.join([
             "I'm sure that they really care about you. Please talk to them about how you are feeling!"
         ])
 
     def finish_good_response(self):
-        self.flag = True
         return '\n '.join([
             "That's great to hear!",
             "Remember that it is healthy to talk about your emotions, so please let me know if you're feeling any negativity. ",
