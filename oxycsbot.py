@@ -492,22 +492,35 @@ class OxyCSBot(ChatBot):
         return response
 
     def respond_from_why_sad(self, message, tags):
-        if "failing academics" in tags:
-            return self.go_to_state('talk_to_professors')
-        elif "social isolation" in tags:
-            return self.go_to_state('clubs')
+        if "sad" in tags:
+            return self.go_to_state('why_sad')
+        elif "good" in tags:
+            return self.finish("good_response")
+        elif "suicidal" in tags:
+            return self.go_to_state('suicidal_response_friends')
+        elif "anxious" in tags:
+            return self.go_to_state('anxious_breathe')
+        elif "thanks" in tags and self.finish_flag:
+            return self.finish("thanks")
+        elif "thanks" in tags and not self.finish_flag:
+            return self.go_to_state("confused")
+        elif "idk" in tags:
+            return self.go_to_state("figure_out_feelings")
         elif 'health issues' in tags:
             return self.finish('health_resources')
         elif "difficult courses" in tags:
             return self.finish('academic_resources')
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
-        elif "idk" in tags:
-            return self.go_to_state("figure_out_feelings")
         elif "specific events" in tags:
             return self.go_to_state("specific_event_response")
+        elif "help" in tags or "hi" in tags:
+            return self.go_to_state('greeting')
+        elif "no" in tags and self.finish_flag:
+            return self.finish("cant_help")
         else:
-            return self.go_to_state('confused')
+            return self.go_to_state("confused")
+        
         # FIXME add in specific_event
 
     # specific_events_reponse state functions
