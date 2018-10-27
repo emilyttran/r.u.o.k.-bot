@@ -61,6 +61,7 @@ class ChatBot:
             ]))
         self.default_state = default_state
         self.state = self.default_state
+        self.prev_state = ""
         self.flag = False
         self.tags = {}
         self._check_states()
@@ -111,7 +112,11 @@ class ChatBot:
         ])
         on_enter_method = getattr(self, f'on_enter_{state}')
         response = on_enter_method()
+        self.prev_state = self.state
         self.state = state
+        print("previous state " + self.prev_state)
+        print("destination state " + self.state)
+
         return response
 
     def chat(self):
@@ -138,6 +143,7 @@ class ChatBot:
         """
         respond_method = getattr(self, f'respond_from_{self.state}')
         print(self._get_tags(message))
+
         return respond_method(message, self._get_tags(message))
 
     def finish(self, manner):
@@ -192,7 +198,9 @@ class OxyCSBot(ChatBot):
         'clubs',
         'suicidal_response_friends',
         'anxious_breathe',
-        'figure_out_feelings'
+        'figure_out_feelings',
+        'specific_event_response',
+        'confused'
     ]
 
     TAGS = {
@@ -224,6 +232,7 @@ class OxyCSBot(ChatBot):
         "worried": "anxious",
         "nervous": "anxious",
         "restless": "anxious",
+        "overwhelmed": "anxious",
         "agitated": "anxious",
         "life": "anxious",
         "uneasy": "anxious",
@@ -297,7 +306,6 @@ class OxyCSBot(ChatBot):
         "overwhelm": "courses overload",
         "demanding": "courses overload",
         "so much": "courses overload",
-        "overwhelmed": "courses overload",
         "burdened": "courses overload",
         "exhausted": "courses overload",
         "exhausting": "courses overload",
@@ -306,6 +314,18 @@ class OxyCSBot(ChatBot):
         "crazy": "courses overload",
         "intense": "courses overload",
         "so done": "courses overload",
+
+        # specific events
+        "happened": "specific events",
+        "fight": "specific events",
+        "fought": "specific events",
+        "told": "specific events",
+        "said": "specific events",
+        "then": "specific events",
+        "today": "specific events",
+        "yesterday": "specific events",
+        "occured": "specific events",
+        "recently": "specific events",
 
         # professors
         'kathryn': 'kathryn',
@@ -329,6 +349,7 @@ class OxyCSBot(ChatBot):
         'yes': 'yes',
         'ya': 'yes',
         'yep': 'yes',
+        'yeah': 'yes',
         'no': 'no',
         'nope': 'no',
         'not really': 'no',
@@ -359,6 +380,8 @@ class OxyCSBot(ChatBot):
         The `professor` member variable stores whether the target
         professor has been identified.
         """
+
+
         super().__init__(default_state='waiting')
 
     def respond_using(self, state, message):
@@ -386,13 +409,15 @@ class OxyCSBot(ChatBot):
             return self.finish('academic_resources')
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
+        elif "specific events" in tags:
+            return self.go_to_state("specific_event_response")
         elif "help" in tags or "hi" in tags:
             return self.go_to_state('greeting')
         elif "success" in tags and self.flag==True:
             self.flag = False
             return self.finish("success")
         else:
-            return self.finish("confused")
+            return self.go_to_state("confused")
         # FIXME add in anxious, idk,
 
     # greeting state functions
@@ -458,9 +483,21 @@ class OxyCSBot(ChatBot):
             return self.finish('course_overload_response')
         elif "idk" in tags:
             return self.go_to_state("figure_out_feelings")
+        elif "specific events" in tags:
+            return self.go_to_state("specific_event_response")
         else:
-            return self.finish('confused')
+            return self.go_to_state('confused')
         # FIXME add in specific_event
+
+    # specific_events_reponse state functions
+
+    def on_enter_specific_event_response(self):
+        return '\n '.join([
+            "Sounds like a rough experience. How do you feel about it?"
+        ])
+
+    def respond_from_specific_event_response(self, message, tags):
+        return self.respond_using("waiting", message)
 
     # figure_out_feeling state functions
 
@@ -560,6 +597,20 @@ class OxyCSBot(ChatBot):
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
         # FIXME add why_sad responses
+
+    # confused stated functions
+
+    def on_enter_confused(self):
+            return '\n '.join([
+                "Sorry, I am just a bot.",
+                "Can you check for typos or rephrase what you were saying?"
+            ])
+
+    def respond_from_confused(self, message, tags):
+        if self.prev_state == self.state: # if bot is confused twice in a row
+            return self.finish("fail")
+        else:
+            return self.respond_using(self.prev_state, message)
 
     # "specific_faculty" state functions
 
