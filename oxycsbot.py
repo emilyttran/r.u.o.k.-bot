@@ -64,6 +64,7 @@ class ChatBot:
         self.prev_state = ""
         self.finish_flag = False  # Keeps track if the conversation has reached an end
         self.greeted_flag = False   # Keeps track if user has already been greeted
+        self.try_count = 0 # Keeps track of how many times bot is confused in a row
         self.tags = {}
         self._check_states()
         self._check_tags()
@@ -113,7 +114,9 @@ class ChatBot:
         ])
         on_enter_method = getattr(self, f'on_enter_{state}')
         response = on_enter_method()
-        self.prev_state = self.state
+        if not (state is "confused" and self.state is "confused"): # if both the next and current state are confused, don't change prev_state
+            self.prev_state = self.state
+
         self.state = state
         print("previous state " + self.prev_state)
         print("destination state " + self.state)
@@ -143,7 +146,7 @@ class ChatBot:
             str: The response of the chatbot.
         """
         respond_method = getattr(self, f'respond_from_{self.state}')
-        print(self._get_tags(message))
+        #print(self._get_tags(message))
 
         return respond_method(message, self._get_tags(message))
 
@@ -161,7 +164,7 @@ class ChatBot:
         self.finish_flag = True
         response = getattr(self, f'finish_{manner}')()
         print(self.state)
-        if manner is "success" or manner is "fail" or manner is "thanks": # if it truly is the end of the conversation, add the tag
+        if manner is "success" or manner is "fail" or manner is "thanks" or manner is "cant_help": # if it truly is the end of the conversation, add the tag
             self.state = self.default_state
             self.finish_flag = False
             return '\n'.join([
@@ -211,6 +214,7 @@ class OxyCSBot(ChatBot):
         'figure_out_feelings',
         'specific_event_response',
         'confused',
+        'why_not'
     ]
 
     TAGS = {
@@ -430,6 +434,8 @@ class OxyCSBot(ChatBot):
         elif "success" in tags and self.greeted_flag:
             self.greeted_flag = False
             return self.finish("good_response")
+        elif "no" in tags and self.finish_flag:
+            return self.finish("cant_help")
         else:
             return self.go_to_state("confused")
 
@@ -616,13 +622,17 @@ class OxyCSBot(ChatBot):
     # confused stated functions
 
     def on_enter_confused(self):
-            return '\n '.join([
+        self.try_count = self.try_count + 1
+        return '\n '.join([
                 "Sorry, I am just a bot. And I'm confused about what you just typed.",
-                "Maybe try checking for typos or rephrasing what you were saying?"
+                "Maybe try checking for typos or rephrasing what you were saying?",
+
+
             ])
 
     def respond_from_confused(self, message, tags):
-        if self.prev_state == self.state: # if bot is confused twice in a row
+        if self.try_count == 2: # if bot is confused twice in a row, fail the conversation
+            self.try_count = 0
             return self.finish("fail")
         else:
             return self.respond_using(self.prev_state, message)
@@ -678,6 +688,13 @@ class OxyCSBot(ChatBot):
     def finish_fail(self):
         return "I've tried my best but I still don't understand. Maybe try asking other students?"
 
+    def finish_cant_help(self):
+        return '\n '.join([
+            "I know it's hard to take my advice since I'm just a bot.",
+            "Please refer to a human counselor for more personal help.",
+            "Everything will be okay!"
+             ])
+
     def finish_thanks(self):
         return "You're welcome!"
 
@@ -700,12 +717,15 @@ class OxyCSBot(ChatBot):
 
     def finish_course_overload_response(self):
         return '\n'.join([
-            "DROP A CLASS"  #FIXME
+            "I reccommend dropping a course, but you can also reach out to your professor to work things out.",
+            "How does that sound?" #FIXME
         ])
 
     def finish_academic_resources(self):
         return '\n'.join([
-            "ACADEMIC RESOURCES"  #FIXME
+            "Courses can be very difficult and time consuming. ",
+            "Sometimes, we need extra help and guidance. And that's okay!",
+            "I suggest using the tutoring services or interacting with your professors more during their office hours!"#FIXME
         ])
 
     def finish_join_clubs(self):
