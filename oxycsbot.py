@@ -62,7 +62,7 @@ class ChatBot:
         self.default_state = default_state
         self.state = self.default_state
         self.prev_state = ""
-        self.finish_flag = False  # Keeps track if the conversation has reached an end
+        self.finish_flag = False  # Keeps track if the conversation has reached an "end"
         self.greeted_flag = False   # Keeps track if user has already been greeted
         self.try_count = 0 # Keeps track of how many times bot is confused in a row
         self.tags = {}
@@ -114,7 +114,9 @@ class ChatBot:
         ])
         on_enter_method = getattr(self, f'on_enter_{state}')
         response = on_enter_method()
-        if not (state is "confused" and self.state is "confused"): # if both the next and current state are confused, don't change prev_state
+
+
+        if not (state is "confused" and self.state is "confused"): # if both the next and current state are confused, don't change prev_state (because we want to return to the state prior to confuse (to continue the conversation)
             self.prev_state = self.state
 
         self.state = state
@@ -147,7 +149,6 @@ class ChatBot:
         """
         respond_method = getattr(self, f'respond_from_{self.state}')
         #print(self._get_tags(message))
-
         return respond_method(message, self._get_tags(message))
 
     def finish(self, manner):
@@ -164,7 +165,7 @@ class ChatBot:
         self.finish_flag = True
         response = getattr(self, f'finish_{manner}')()
         print(self.state)
-        if manner is "success" or manner is "fail" or manner is "thanks" or manner is "cant_help": # if it truly is the end of the conversation, add the tag
+        if manner is "success" or manner is "fail" or manner is "thanks" or manner is "cant_help": # if it truly is the end of the conversation, add the tag so that users don't try to continue the conbo
             self.state = self.default_state
             self.finish_flag = False
             return '\n'.join([
@@ -173,7 +174,7 @@ class ChatBot:
                 "< Conversation has ended >"
             ])
         else:
-            self.state = self.default_state # don't need to reset finish flag so that user can respond to bot
+            self.state = self.default_state # don't need to reset finish flag like in the if black to give user a chance to respond back
             return response
 
 
@@ -364,6 +365,9 @@ class OxyCSBot(ChatBot):
         'ya': 'yes',
         'yep': 'yes',
         'yeah': 'yes',
+        'little bit': 'yes',
+        'a little': 'yes',
+        'not': 'yes',
         'no': 'no',
         'nope': 'no',
         'not really': 'no',
@@ -481,6 +485,8 @@ class OxyCSBot(ChatBot):
             return self.finish('hotline')
         elif "yes" in tags:
             return self.finish('talk_to_friends')
+        else:
+            return self.go_to_state("confused")
 
     # "why_sad" state functions
 
@@ -520,7 +526,7 @@ class OxyCSBot(ChatBot):
             return self.finish("cant_help")
         else:
             return self.go_to_state("confused")
-        
+
         # FIXME add in specific_event
 
     # specific_events_reponse state functions
@@ -558,7 +564,7 @@ class OxyCSBot(ChatBot):
             return self.finish('academic_resources')
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
-        elif "help" or "hi" in tags:
+        elif "help" in tags or "hi" in tags:
             return self.go_to_state('greeting')
         else:
             return self.finish("confused")
@@ -582,7 +588,8 @@ class OxyCSBot(ChatBot):
             return self.finish('join_clubs')
         elif 'idk' in tags:
             return self.finish('should_join_club')
-        # FIXME need else
+        else:
+            return self.go_to_state("confused")
 
     # why_not state fucntions
 
@@ -590,8 +597,34 @@ class OxyCSBot(ChatBot):
         return "Hmm, I see. Why not, if I might ask?"
 
     def respond_from_why_not(self, message, tags):
-        # FIXME paste in content of respond_from_why_sad and respond_from_why_anxious when it's finished
-        return "FIXME"
+        if "sad" in tags:
+            return self.go_to_state('why_sad')
+        elif "good" in tags:
+            return self.finish("good_response")
+        elif "suicidal" in tags:
+            return self.go_to_state('suicidal_response_friends')
+        elif "anxious" in tags:
+            return self.go_to_state('anxious_breathe')
+        elif "thanks" in tags and self.finish_flag:
+            return self.finish("thanks")
+        elif "thanks" in tags and not self.finish_flag:
+            return self.go_to_state("confused")
+        elif "idk" in tags:
+            return self.go_to_state("figure_out_feelings")
+        elif 'health issues' in tags:
+            return self.finish('health_resources')
+        elif "difficult courses" in tags:
+            return self.finish('academic_resources')
+        elif "courses overload" in tags:
+            return self.finish('course_overload_response')
+        elif "specific events" in tags:
+            return self.go_to_state("specific_event_response")
+        elif "help" in tags or "hi" in tags:
+            return self.go_to_state('greeting')
+        elif "no" in tags and self.finish_flag:
+            return self.finish("cant_help")
+        else:
+            return self.go_to_state("confused")
 
     # talk_to_professors state functions
 
@@ -609,7 +642,8 @@ class OxyCSBot(ChatBot):
         elif 'yes' in tags:
             return self.go_to_state('other_factors')
         else:
-            return self.finish('fail')
+            return self.go_to_state("confused")
+
 
     # "other_factors" state functions
 
@@ -624,22 +658,43 @@ class OxyCSBot(ChatBot):
         return response
 
     def respond_from_other_factors(self, message, tags):
-        if 'health issues' in tags:
+        if "sad" in tags:
+            return self.go_to_state('why_sad')
+        elif "good" in tags:
+            return self.finish("good_response")
+        elif "suicidal" in tags:
+            return self.go_to_state('suicidal_response_friends')
+        elif "anxious" in tags:
+            return self.go_to_state('anxious_breathe')
+        elif "thanks" in tags and self.finish_flag:
+            return self.finish("thanks")
+        elif "thanks" in tags and not self.finish_flag:
+            return self.go_to_state("confused")
+        elif "idk" in tags:
+            return self.go_to_state("figure_out_feelings")
+        elif 'health issues' in tags:
             return self.finish('health_resources')
         elif "difficult courses" in tags:
             return self.finish('academic_resources')
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
-        # FIXME add why_sad responses
+        elif "specific events" in tags:
+            return self.go_to_state("specific_event_response")
+        elif "help" in tags or "hi" in tags:
+            return self.go_to_state('greeting')
+        elif "no" in tags and self.finish_flag:
+            return self.finish("cant_help")
+        else:
+            return self.go_to_state("confused")
 
     # confused stated functions
 
     def on_enter_confused(self):
         self.try_count = self.try_count + 1
+
         return '\n '.join([
                 "Sorry, I am just a bot. And I'm confused about what you just typed.",
                 "Maybe try checking for typos or rephrasing what you were saying?",
-
 
             ])
 
@@ -738,7 +793,7 @@ class OxyCSBot(ChatBot):
         return '\n'.join([
             "Courses can be very difficult and time consuming. ",
             "Sometimes, we need extra help and guidance. And that's okay!",
-            "I suggest using the tutoring services or interacting with your professors more during their office hours!"#FIXME
+            "I suggest using the tutoring services or interacting with your professors more during their office hours."#
         ])
 
     def finish_join_clubs(self):
