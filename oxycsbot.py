@@ -120,8 +120,8 @@ class ChatBot:
             self.prev_state = self.state
 
         self.state = state
-        print("previous state " + self.prev_state)
-        print("destination state " + self.state)
+        #print("previous state " + self.prev_state)
+        #print("destination state " + self.state)
 
         return response
 
@@ -266,6 +266,7 @@ class OxyCSBot(ChatBot):
         "frustrated": "failing academics",
         "annoyed": "failing academics",
         "efforts": "failing academics",
+        "failing": "failing academics",
         "quit school": "failing academics",
 
         # social isolation
@@ -279,7 +280,6 @@ class OxyCSBot(ChatBot):
         "abandoned": "social isolation",
         "care about me": "social isolation",
         "not cared for": "social isolation",
-        "failing": "social isolation",
 
         # suicidal
         "die": "suicidal",
@@ -314,6 +314,7 @@ class OxyCSBot(ChatBot):
         "I'm behind": "difficult courses",
         "trouble": "difficult courses",
         "helpless": "difficult courses",
+        "failing": "difficult courses",
 
         # overload
         "too much": "courses overload",
@@ -367,12 +368,14 @@ class OxyCSBot(ChatBot):
         'yeah': 'yes',
         'little bit': 'yes',
         'a little': 'yes',
-        'not': 'yes',
+        'not': 'no',
         'no': 'no',
         'nope': 'no',
         'not really': 'no',
         'nah': 'no',
         'no thanks': 'no',
+        "don't want to": "no",
+        "want to": "yes",
         'idk': 'idk',
         'not sure': 'idk',
         "don't know": 'idk',
@@ -413,6 +416,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('why_sad')
         elif "good" in tags:
             return self.finish("good_response")
+        elif "social isolation" in tags:
+            return self.go_to_state("clubs")
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
@@ -466,7 +471,7 @@ class OxyCSBot(ChatBot):
     def respond_from_anxious_breathe(self, message, tags):
         if "yes" in tags:
             return self.finish("success")
-        elif "no" or "idk" in tags:
+        elif "no" in tags or "idk" in tags:
             return self.go_to_state("why_not")
 
     # suicidal_response_friends state functions
@@ -506,6 +511,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
             return self.go_to_state('anxious_breathe')
+        elif "social isolation" in tags:
+            return self.go_to_state("clubs")
         elif "thanks" in tags and self.finish_flag:
             return self.finish("thanks")
         elif "thanks" in tags and not self.finish_flag:
@@ -556,6 +563,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
             return self.go_to_state('anxious_breathe')
+        elif "social isolation" in tags:
+            return self.go_to_state("clubs")
         elif "idk" in tags:
             return self.go_to_state("why_sad")
         elif 'health issues' in tags:
@@ -615,6 +624,10 @@ class OxyCSBot(ChatBot):
             return self.finish('health_resources')
         elif "difficult courses" in tags:
             return self.finish('academic_resources')
+        elif 'failing academics' in tags:
+            return self.go_to_state("talk_to_professors")
+        elif "social isolation" in tags:
+            return self.go_to_state("clubs")
         elif "courses overload" in tags:
             return self.finish('course_overload_response')
         elif "specific events" in tags:
@@ -672,6 +685,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state("confused")
         elif "idk" in tags:
             return self.go_to_state("figure_out_feelings")
+        elif "social isolation" in tags:
+            return self.go_to_state("clubs")
         elif 'health issues' in tags:
             return self.finish('health_resources')
         elif "difficult courses" in tags:
