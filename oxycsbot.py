@@ -537,7 +537,7 @@ class OxyCSBot(ChatBot):
         ])
 
     def respond_from_specific_event_response(self, message, tags):
-        return self.respond_using("waiting", message)
+        return self.respond_using("why_sad", message)
 
     # figure_out_feeling state functions
 
