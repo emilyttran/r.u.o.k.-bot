@@ -467,7 +467,7 @@ class OxyCSBot(ChatBot):
         if "yes" in tags:
             return self.finish("success")
         elif "no" or "idk" in tags:
-            return self.go_to_state("why_sad")
+            return self.go_to_state("why_not")
 
     # suicidal_response_friends state functions
 
