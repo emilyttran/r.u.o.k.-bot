@@ -838,7 +838,7 @@ class OxyCSBot(ChatBot):
         return '\n'.join([
             "That's okay. No matter the case, know that you deserve to live. ",
             "And if you feel like causing harm to yourself, please call a friend or the hotline.",
-            "We can also talk about what you're feeling"
+            "We can also talk about what you're feeling whenever you're ready"
         ])
 
     def finish_hotline(self):
