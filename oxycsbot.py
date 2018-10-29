@@ -199,7 +199,7 @@ class ChatBot:
         return counter
 
 
-class RUOKBot(ChatBot):
+class OxyCSBot(ChatBot):
     """A simple chatbot that directs students to office hours of CS professors."""
 
     STATES = [
@@ -863,4 +863,4 @@ class RUOKBot(ChatBot):
 
 
 if __name__ == '__main__':
-    RUOKBot().chat()
+    OxyCSBot().chat()
