@@ -544,7 +544,7 @@ class OxyCSBot(ChatBot):
 
     def on_enter_specific_event_response(self):
         return '\n '.join([
-            "Sounds like a rough experience. Has it effected your school experience?"
+            "Sounds like a rough experience. How has it effected your school experience?"
         ])
 
     def respond_from_specific_event_response(self, message, tags):
