@@ -436,6 +436,8 @@ class OxyCSBot(ChatBot):
             return self.finish('course_overload_response')
         elif "specific events" in tags:
             return self.go_to_state("specific_event_response")
+        elif 'failing academics' in tags:
+            return self.go_to_state("talk_to_professors")
         elif "help" in tags or "hi" in tags:
             return self.go_to_state('greeting')
         elif "success" in tags and self.finish_flag: # show success if user says ok at the end of conversation
@@ -517,6 +519,8 @@ class OxyCSBot(ChatBot):
             return self.finish("thanks")
         elif "thanks" in tags and not self.finish_flag:
             return self.go_to_state("confused")
+        elif 'failing academics' in tags:
+            return self.go_to_state("talk_to_professors")
         elif "idk" in tags:
             return self.go_to_state("figure_out_feelings")
         elif 'health issues' in tags:
@@ -567,6 +571,8 @@ class OxyCSBot(ChatBot):
             return self.go_to_state("why_sad")
         elif 'health issues' in tags:
             return self.finish('health_resources')
+        elif 'failing academics' in tags:
+            return self.go_to_state("talk_to_professors")
         elif "difficult courses" in tags:
             return self.finish('academic_resources')
         elif "courses overload" in tags:
