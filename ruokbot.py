@@ -149,6 +149,8 @@ class ChatBot:
         """
         respond_method = getattr(self, f'respond_from_{self.state}')
         #print(self._get_tags(message))
+        if self.state is not "confused":
+            self.try_count = 0
         return respond_method(message, self._get_tags(message))
 
     def finish(self, manner):
@@ -197,7 +199,7 @@ class ChatBot:
         return counter
 
 
-class OxyCSBot(ChatBot):
+class RUOKBot(ChatBot):
     """A simple chatbot that directs students to office hours of CS professors."""
 
     STATES = [
@@ -225,11 +227,13 @@ class OxyCSBot(ChatBot):
         'hello':'hi',
         'howdy': 'hi',
         "what's up": 'hi',
+        "hey": "hi",
 
         # sad
         "sad": "sad",
         'hate': 'sad',
         'depressed': "sad",
+        "depression": "depression",
         'disappointed': "sad",
         'miss': "sad",
         'hopeless': "sad",
@@ -280,6 +284,7 @@ class OxyCSBot(ChatBot):
         "abandoned": "social isolation",
         "care about me": "social isolation",
         "not cared for": "social isolation",
+        "isolated": "isolated",
 
         # suicidal
         "die": "suicidal",
@@ -293,6 +298,8 @@ class OxyCSBot(ChatBot):
         "worthless": "suicidal",
         "no purpose": "suicidal",
         "alive": "suicidal",
+        "suicidal": "suicidal",
+        "suicide": "suicide",
 
         # health issues
         "sick": "health issues",
@@ -856,4 +863,4 @@ class OxyCSBot(ChatBot):
 
 
 if __name__ == '__main__':
-    OxyCSBot().chat()
+    RUOKBot().chat()
