@@ -773,7 +773,7 @@ class OxyCSBot(ChatBot):
         return 'Alright. Hang in there, let know if you need anything else'
 
     def finish_fail(self):
-        return "I've tried my best but I still don't understand. Maybe try asking other students?"
+        return "I've tried my best but I still don't understand. Maybe try talking to a human counselor?"
 
     def finish_cant_help(self):
         return '\n '.join([
