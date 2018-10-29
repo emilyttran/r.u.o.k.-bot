@@ -164,7 +164,7 @@ class ChatBot:
         """
         self.finish_flag = True
         response = getattr(self, f'finish_{manner}')()
-        print(self.state)
+        #print(self.state)
         if manner is "success" or manner is "fail" or manner is "thanks" or manner is "cant_help": # if it truly is the end of the conversation, add the tag so that users don't try to continue the conbo
             self.state = self.default_state
             self.finish_flag = False
@@ -540,7 +540,7 @@ class OxyCSBot(ChatBot):
 
     def on_enter_specific_event_response(self):
         return '\n '.join([
-            "Sounds like a rough experience. How do you feel about it?"
+            "Sounds like a rough experience. Has it effected your school experience?"
         ])
 
     def respond_from_specific_event_response(self, message, tags):
@@ -555,10 +555,8 @@ class OxyCSBot(ChatBot):
         ])
 
     def respond_from_figure_out_feelings(self, message, tags):
-        if "sad" in tags or "yes" in tags:
+        if "sad" in tags or "yes" in tags or "no" in tags:
             return self.go_to_state('why_sad')
-        elif "no" in tags:
-            return self.finish('fail')
         elif "suicidal" in tags:
             return self.go_to_state('suicidal_response_friends')
         elif "anxious" in tags:
@@ -576,7 +574,7 @@ class OxyCSBot(ChatBot):
         elif "help" in tags or "hi" in tags:
             return self.go_to_state('greeting')
         else:
-            return self.finish("confused")
+            return self.go_to_state("confused")
 
     # clubs state functions
 
